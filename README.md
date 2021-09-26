@@ -7,6 +7,6 @@ This application generates Order for Kitchen application. Order consists of thre
 
 **Technical properties**
 
-Main language: Python3
-Framework: Django
-Additional software used in project: Docker
+- Main language: Python3
+- Framework: Django
+- Additional software used in project: Docker
