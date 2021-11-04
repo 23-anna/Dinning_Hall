@@ -81,174 +81,6 @@ foods = [{
 "cooking-apparatus": "null"
 }]
 
-# global exitFlag
-# global waiter_semaphore
-# waiter_semaphore = 0
-# global waiters
-# waiters = []
-
-# class myTable (threading.Thread):
-#     def __init__(self, threadID, name, q):
-#         threading.Thread.__init__(self)
-#         self.threadID = threadID
-#         self.name = name
-#         self.q = q
-#     def run(self):
-#         print ("Generating order at " + self.name)
-#         process_data_by_table(self.name, self.q)
-#         print (self.name + " gets the order")
-#
-# def process_data_by_table(threadName, q):
-#     print("     Enter function process_data_by_table")
-#     # print('!!!!!!!!!!!!!!!!')
-#     generate_order("http://127.0.0.2:8000/kitchen/")
-#     call_waiter(threadName)
-
-        # threadID += 1
-
-    # call waiter
-    # get order
-
-# def call_waiter(threadName):
-#     global waiter_semaphore
-#     global waiters
-#     print('THREADNAME = ', threadName)
-#     if (waiter_semaphore < 5):
-#         waiter_semaphore +=1
-#         print("Number of waiters busy: " + str(waiter_semaphore))
-#         thread_waiter = myWaiter(threadName)
-#         # time.sleep(0.5)
-#         thread_waiter.start()
-#         print('.run()!!!!!!!!!!!!!!!!!!!!!!')
-#         thread_waiter.run(threadName)
-#         waiters.append(thread_waiter)
-#         waiter_semaphore -= 1
-#     else:
-#         time.sleep(1)
-#         call_waiter(threadName)
-
-    # exitFlag = 1 #???????
-    # while not exitFlag:
-    #     queueLock.acquire()
-    #     if (not workQueue.empty()):
-    #         data = q.get()
-    #         queueLock.release()
-    #         print ("%s processing %s" % (threadName, data))
-    #     else:
-    #         queueLock.release()
-    #         time.sleep(1)
-
-
-# class myWaiter(threading.Thread):
-#     def __init__(self, threadName):
-#         threading.Thread.__init__(self)
-#         # self.threadID = threadID
-#         # self.name = name
-#         # self.q = q
-#         self.threadName = threadName
-#     def run(self, threadName):
-#         # print ("Picking order by " + self.name)
-#         # process_data_by_waiter(self.name, self.q)
-#         time.sleep(2)
-#         print ("Order of " + threadName + " was sent to the Kitchen")
-
-
-#
-# def table_status(request):
-#     table_list = []
-#     for i in range (1, 11):
-#         table_list.append("Table " + str(i))
-#
-#     waiter_list = []
-#     for i in range (1, 6):
-#         waiter_list.append("Waiter " + str(i))
-#
-#     threads = []
-#     waiters = []
-#     # nameList = ["One", "Two", "Three", "Four", "Five"]
-#     queueLock = threading.Lock()
-#     workQueue = queue.Queue(10)
-#     threadID = 1
-#
-#     # Create new threads
-#     # while (True):
-#     for tName in table_list:
-#        thread = myTable(threadID, tName, workQueue)
-#        # time.sleep(0.5)
-#        thread.start()
-#        threads.append(thread)
-#        threadID += 1
-#
-#     # Fill the queue
-#     queueLock.acquire()
-#     # for word in nameList:
-#     #    workQueue.put(word)
-#     queueLock.release()
-#
-#     # Wait for queue to empty
-#     while not workQueue.empty():
-#        pass
-#
-#     # Notify threads it's time to exit
-#     # exitFlag = 1
-#
-#     # Wait for all threads to complete
-#     for t in threads:
-#        t.join()
-#     print ("Exiting Main Thread")
-
-
-    # table_list = []
-
-    # threads = []
-    # global variables
-    # global table_number
-    # table_number = 5
-    # waiters = table_number // 2
-    #
-    # dict_key = ['thread%s' % variable for variable in range(table_number)]
-    # dict_value = [1 for x in range(5)]
-    # variables = dict(zip(dict_key, dict_value))
-    # check_status()
-    # for table in range(table_number):
-        # table_list.append("Table " + str(table + 1))
-
-        # thread = Thread()
-        # thread.start()
-        # threads.append(thread)
-        # print(threads)
-        # check_status(threads[table])
-    # print(table_list)
-    # print('THREADS:', thread0, thread1, thread2, thread3, thread4)
-    # return HttpResponse(threads, waiters)
-
-
-# def check_status():
-#     random_time = random.randint(1, 8)
-#     for table in range(table_number):
-#         if variables["thread%s" % str(table)] == 1:
-#             time.sleep(random_time)
-#             print('Table %s' % table, 'is now occupied!')
-#     return generate_order('http://127.0.0.1:8000/dinning/orders/')
-
-
-
-# def generate_order(request):
-#     print("     Entering function generate_order")
-#     items = []
-#     random_counter = random.randint(1, 10)
-#     for i in range(random_counter):
-#         random_id = random.randint(1, 10) #see in json file Foods
-#         items.append(random_id)
-#         items.append(' ')
-#     order_priority = random.randint(1, 5)
-#     max_wait = random.randint(15, 25)
-#     time.sleep(max_wait)
-
-    #
-    #
-    # return HttpResponse(items)
-
 global number_of_tables
 global number_of_waiters
 global waiter_semaphore
@@ -265,18 +97,39 @@ table_queue = []
 lock = threading.Lock()
 
 
-def table(table_name, status, number):
+def table(request, table_name, status, number):
     order = ""
+    received_id = {'order_id': -1}
+    stars = 0
     print(table_name + " is generating an order")
     order = generate_order()
+    start_time = time.time()
     call_waiter(table_name, order)
+    while (received_id['order_id'] != order['id']):
+        print("received id " + str(received_id['order_id']) + " order_id " + str(order['id']))
+        print("Table loop while")
+        if request.method == 'POST':
+            received_id = request.POST.get('order_id')
+            print("Received id: " + str(received_id['order_id']))
+    end_time = time.time()
+    general_time = start_time - end_time
+    if (general_time <= order['max_wait']):
+        stars = 5
+    elif (general_time <= order['max_wait'] * 1.1):
+        stars = 4
+    elif (general_time <= order['max_wait'] * 1.2):
+        stars = 3
+    elif (general_time <= order['max_wait'] * 1.3):
+        stars = 2
+    elif (general_time <= order['max_wait'] * 1.4):
+        stars = 1
+    print("Max wait time: " + str(order['max_wait']) + ",  General time: " + str(general_time) + ",  " + table_name + " puts " + str(stars) + " stars")
     table_queue[number] = 0
     print(table_name + " is free now!!!")
 
 def generate_order():
     global order_id
 
-    # print("     Entering function generate_order")
     items = []
 
     id = order_id
@@ -288,7 +141,7 @@ def generate_order():
     order_priority = '0'
 
     for dish in range(random_counter):
-        random_id = random.randint(1, 10) #see in json file Foods
+        random_id = random.randint(1, 10)
         items.append(random_id)
         if max_wait < foods[int(random_id - 1)]["preparation-time"]:
             max_wait = foods[int(random_id - 1)]["preparation-time"]
@@ -303,42 +156,21 @@ def generate_order():
     else:
         order_priority = '1'
 
-
     max_wait *= 1.3
 
-
-
-        # items.append(' ')
-
-    # order_priority = random.randint(1, 5)
-    # max_wait = random.randint(15, 25)
-    # time.sleep(max_wait-2)
-    # print(items, max_wait, order_priority, order_id, 'ITEMS + MAX WAIT + ORDER PR + ORDER ID')
-
     print("Order of " + table_name + " is ready")
-
-    # return ('''
-    # {{
-    # "id": {},
-    # "items": {},
-    # "priority": {},
-    # "max_wait": {}
-    # }}'''.format(order_id, items, order_priority, max_wait - 2))
-    order = {"id" : order_id, "items": items, "priority": order_priority, "max_wait": max_wait - 2}
+    order = {"id" : order_id, "items": items, "priority": order_priority, "max_wait": max_wait}
     print(order)
     return order
 
 
-
+@csrf_exempt
 def call_waiter(table_name, order):
-    # global table_name
     global waiter_semaphore
 
     if waiter_semaphore < number_of_waiters:
-        # lock.acquire()
         waiter_semaphore += 1
         print(str(waiter_semaphore) + " waiters are busy now")
-        # lock.release()
         waiter_name = table_name + " waiter"
         thread_waiter = threading.Thread(target=waiter, name=waiter_name, args=('http://127.0.0.2:8000/kitchen/', order,))
         thread_waiter.start()
@@ -346,29 +178,19 @@ def call_waiter(table_name, order):
         time.sleep(1)
         call_waiter(table_name, order)
 
-
+@csrf_exempt
 def waiter(request, order):
     global waiter_semaphore
 
     time.sleep(2)
-    # lock.acquire()
     waiter_semaphore -= 1
-    # lock.release()
-    # print("Order of " + table_name + " is ready") here will be a request
     headers = {'Content-Type' : 'application/json'}
-    # # lock.acquire()
     response = requests.post('http://127.0.0.2:8000/kitchen/', data=json.dumps(order), headers = headers)
     print(response.content)
     time.sleep(10)
-    # if response.status_code == 200:
-    #     return HttpResponse(response.content, content_type = 'application/json')
-    # else:
-    #     print("Express dostavka")
-    # return HttpResponse({'a': '2'})
-    # lock.release()
-    # print(response.status_code)
     return HttpResponse(order)
 
+@csrf_exempt
 def main(request):
     global table_name
     global table_queue
@@ -376,17 +198,12 @@ def main(request):
     for i in range(0, number_of_tables):
         table_queue.append(0)
 
-    # while True:
-    #     time.sleep(1)
-    for i in range (0, number_of_tables):
-        if (table_queue[i] == 0):
-            table_queue[i] = 1
-            status = 1
-            table_name = "Table " + str(i+1)
-            thread_table = threading.Thread(target=table, name=table_name, args=(table_name, 1, i))
-            thread_table.start()
-    return HttpResponse("Ready!!!!!!!!!!!")
-
-# def index(request):
-#     x = requests.get('http://127.0.0.2:8000/kitchen/')
-#     return HttpResponse(x)
+    while True:
+        for i in range (0, number_of_tables):
+            if (table_queue[i] == 0):
+                table_queue[i] = 1
+                status = 1
+                table_name = "Table " + str(i+1)
+                thread_table = threading.Thread(target=table, name=table_name, args=(request, table_name, 1, i))
+                thread_table.start()
+    return HttpResponse("Ready!")
