@@ -187,7 +187,6 @@ def waiter(request, order):
     headers = {'Content-Type' : 'application/json'}
     response = requests.post('http://127.0.0.2:8000/kitchen/', data=json.dumps(order), headers = headers)
     print(response.content)
-    time.sleep(10)
     return HttpResponse(order)
 
 @csrf_exempt
